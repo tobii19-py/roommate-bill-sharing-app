@@ -1,3 +1,5 @@
+from fpdf import FPDF
+
 class Bill:
     """
     Object containing data about a bill, such as
@@ -35,12 +37,31 @@ class PdfReport:
         self.filename = filename
 
     def generate(self, flatmate1, flatmate2, bill):
-        pass
+
+        pdf = FPDF(orientation='P', unit='pt', format='A4')
+        pdf.add_page()
+
+        # Insert a title
+        pdf.set_font(family='Times', size=24, style='B')
+        pdf.cell(w=0, h=80, txt="Flatmates Bill", border=1, align="C", ln=1)
+
+        # Insert Period label and value
+        pdf.cell(w=100, h=40, txt="Period:", border=1)
+        pdf.cell(w=150, h=40, txt=bill.period, border=1, ln=1)
+
+        # Insert the flatmates' names and amount due
+        pdf.cell(w=100, h=40, txt=flatmate1.name, border=1)
+        pdf.cell(w=150, h=40, txt=str(flatmate1.pays(bill, flatmate2)), border=1, ln=1)
+
+        pdf.output(self.filename)
 
 
-the_bill = Bill(amount=120, period="March 2023")
+the_bill = Bill(amount=120, period="April 2023")
 john = Flatmate(name="John", days_in_house=20)
 marry = Flatmate(name="Marry", days_in_house=25)
 
 print("John pays: ", john.pays(bill=the_bill, flatmate2=marry))
 print("Marry pays: ", marry.pays(bill=the_bill, flatmate2=john))
+
+pdf_report = PdfReport(filename="Report1.pdf")
+pdf_report.generate(flatmate1=john, flatmate2=marry, bill=the_bill)
